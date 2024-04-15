@@ -33,3 +33,8 @@ declare namespace globalThis {
     // eslint-disable-next-line no-var
     var expect: ExpectWebdriverIO.Expect;
 }
+
+declare module "expect-webdriverio/lib/matchers" {
+    const matchers: ExpectWebdriverIO.Matchers<Promise<{ pass: boolean; message(): string }>, unknown>;
+    export default matchers;
+}
