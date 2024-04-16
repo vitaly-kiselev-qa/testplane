@@ -65,7 +65,7 @@ function getAllProtocolCommands(): string[] {
 }
 
 function getMockedProtocolCommands(): PropertiesObject {
-    return [...getAllProtocolCommands(), ...window.__testplane__.customCommands].reduce((acc, commandName) => {
+    return [...getAllProtocolCommands(), ...["debug", "saveScreenshot", "savePDF"], ...window.__testplane__.customCommands].reduce((acc, commandName) => {
         acc[commandName] = { value: mockCommand(commandName) };
         return acc;
     }, {} as PropertiesObject);

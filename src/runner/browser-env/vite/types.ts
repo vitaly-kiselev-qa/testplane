@@ -16,4 +16,5 @@ export enum BrowserEventNames {
     initialize = `${BROWSER_EVENT_PREFIX}:initialize`,
     runBrowserCommand = `${BROWSER_EVENT_PREFIX}:runBrowserCommand`,
     runExpectMatcher = `${BROWSER_EVENT_PREFIX}:runExpectMatcher`,
+    recoveryRunRunnable = `${BROWSER_EVENT_PREFIX}:recoveryRunRunnable`,
 }

@@ -9,37 +9,6 @@ export type RunnableFn = (
     ctx: { browser: WebdriverIO.Browser },
 ) => Promise<unknown>;
 
-export enum BrowserEventNames {
-    initialize = `${BROWSER_EVENT_PREFIX}:initialize`,
-    runBrowserCommand = `${BROWSER_EVENT_PREFIX}:runBrowserCommand`,
-    runExpectMatcher = `${BROWSER_EVENT_PREFIX}:runExpectMatcher`,
-}
-
-export interface BrowserRunBrowserCommandPayload {
-    name: string;
-    args: unknown[];
-}
-
-export interface BrowserRunExpectMatcherPayload {
-    name: string;
-    scope: MatcherState;
-    args: unknown[];
-    element?: WebdriverIO.Element | ChainablePromiseElement<WebdriverIO.Element>;
-    context?: WebdriverIO.Browser | WebdriverIO.Element | ElementArray | ChainablePromiseElement<WebdriverIO.Element>;
-}
-
-export interface BrowserViteEvents {
-    [BrowserEventNames.initialize]: (payload: ViteError[]) => void;
-    [BrowserEventNames.runBrowserCommand]: (
-        payload: BrowserRunBrowserCommandPayload,
-        cb: (args: [err: null | Error, result?: unknown]) => void,
-    ) => void;
-    [BrowserEventNames.runExpectMatcher]: (
-        payload: BrowserRunExpectMatcherPayload,
-        cb: (args: [{ pass: boolean; message: string }]) => void,
-    ) => void;
-}
-
 // TODO: use from nodejs code when migrate to esm
 export enum WorkerEventNames {
     initialize = `${WORKER_EVENT_PREFIX}:initialize`,
@@ -66,16 +35,54 @@ export interface WorkerRunRunnablePayload {
     fullTitle: string;
 }
 
+export type WorkerRunRunnableCb = (...args: [null | ViteError[]]) => void;
+
 export interface WorkerViteEvents {
     [WorkerEventNames.initialize]: (payload: WorkerInitializePayload) => void;
     [WorkerEventNames.finalize]: () => void;
     [WorkerEventNames.runRunnable]: (
         payload: WorkerRunRunnablePayload,
-        cb: (...args: [null | ViteError[]]) => void,
+        cb: WorkerRunRunnableCb,
     ) => void;
 }
 
-export type ViteBrowserEvents = Pick<WorkerViteEvents, WorkerEventNames.runRunnable>;
+export enum BrowserEventNames {
+    initialize = `${BROWSER_EVENT_PREFIX}:initialize`,
+    runBrowserCommand = `${BROWSER_EVENT_PREFIX}:runBrowserCommand`,
+    runExpectMatcher = `${BROWSER_EVENT_PREFIX}:runExpectMatcher`,
+    recoveryRunRunnable = `${BROWSER_EVENT_PREFIX}:recoveryRunRunnable`,
+}
+
+export interface BrowserRunBrowserCommandPayload {
+    name: string;
+    args: unknown[];
+}
+
+export interface BrowserRunExpectMatcherPayload {
+    name: string;
+    scope: MatcherState;
+    args: unknown[];
+    element?: WebdriverIO.Element | ChainablePromiseElement<WebdriverIO.Element>;
+    context?: WebdriverIO.Browser | WebdriverIO.Element | ElementArray | ChainablePromiseElement<WebdriverIO.Element>;
+}
+
+export interface BrowserViteEvents {
+    [BrowserEventNames.initialize]: (payload: ViteError[]) => void;
+    [BrowserEventNames.runBrowserCommand]: (
+        payload: BrowserRunBrowserCommandPayload,
+        cb: (args: [err: null | Error, result?: unknown]) => void,
+    ) => void;
+    [BrowserEventNames.runExpectMatcher]: (
+        payload: BrowserRunExpectMatcherPayload,
+        cb: (args: [{ pass: boolean; message: string }]) => void,
+    ) => void;
+    [BrowserEventNames.recoveryRunRunnable]: (
+        payload: WorkerRunRunnablePayload,
+        cb: WorkerRunRunnableCb,
+    ) => void;
+}
+
+export type ViteBrowserEvents = Pick<WorkerViteEvents, WorkerEventNames.runRunnable> & Pick<BrowserViteEvents, BrowserEventNames.recoveryRunRunnable>;
 export type BrowserViteSocket = Socket<ViteBrowserEvents, BrowserViteEvents>;
 
 export type SyncExpectationResult = {
